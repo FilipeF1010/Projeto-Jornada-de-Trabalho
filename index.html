@@ -20,7 +20,10 @@
     --red: #f85149;
     --yellow: #d29922;
     --blue: #58a6ff;
+    --teal: #2dd4bf;
   }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     background: var(--bg);
@@ -30,7 +33,6 @@
     min-height: 100vh;
   }
 
-  /* Header */
   header {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -53,13 +55,8 @@
   }
 
   .logo span { font-size: 20px; }
+  .date-display { color: var(--muted); font-size: 13px; }
 
-  .date-display {
-    color: var(--muted);
-    font-size: 13px;
-  }
-
-  /* Nav */
   nav {
     display: flex;
     gap: 8px;
@@ -79,14 +76,8 @@
   }
 
   .nav-btn:hover { background: var(--surface2); }
+  .nav-btn.active { background: var(--purple); border-color: var(--purple); color: #fff; }
 
-  .nav-btn.active {
-    background: var(--purple);
-    border-color: var(--purple);
-    color: #fff;
-  }
-
-  /* Main content */
   main {
     padding: 24px;
     max-width: 1200px;
@@ -96,10 +87,9 @@
   .page { display: none; }
   .page.active { display: block; }
 
-  /* Cards grid */
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
     margin-bottom: 24px;
   }
@@ -111,6 +101,11 @@
     padding: 20px;
   }
 
+  .card.highlight {
+    border-color: var(--purple);
+    background: #1a1035;
+  }
+
   .card-label {
     font-size: 11px;
     font-weight: 600;
@@ -120,21 +115,16 @@
     margin-bottom: 10px;
   }
 
-  .card-value {
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-
+  .card-value { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
   .card-sub { font-size: 13px; color: var(--muted); }
 
   .green { color: var(--green); }
   .red { color: var(--red); }
   .blue { color: var(--blue); }
   .yellow { color: var(--yellow); }
+  .teal { color: var(--teal); }
+  .purple { color: var(--purple-light); }
 
-  /* Month nav */
   .month-nav {
     display: flex;
     align-items: center;
@@ -158,7 +148,6 @@
 
   .icon-btn:hover { background: var(--border); }
 
-  /* Section box */
   .box {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -185,6 +174,7 @@
 
   .tag-purple { background: #3b1f6e; color: var(--purple-light); }
   .tag-yellow { background: #3d2a00; color: var(--yellow); }
+  .tag-teal   { background: #0d2e2e; color: var(--teal); }
 
   .empty { text-align: center; color: var(--muted); padding: 32px 0; }
 
@@ -197,17 +187,8 @@
     align-items: center;
   }
 
-  .cal-legend {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-  }
-
-  .cal-legend .dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-  }
+  .cal-legend { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .cal-legend .dot { width: 10px; height: 10px; border-radius: 50%; }
 
   .schedule-chip {
     background: var(--surface2);
@@ -249,6 +230,7 @@
     font-weight: 500;
     position: relative;
     min-height: 64px;
+    gap: 2px;
   }
 
   .cal-day:hover:not(.disabled) { border-color: var(--purple); background: #1e1535; }
@@ -256,24 +238,28 @@
   .cal-day.disabled { opacity: .3; cursor: default; }
   .cal-day.sunday { color: var(--muted); }
 
-  .cal-day.has-record { border-color: var(--green); background: #0d2e1a; }
-  .cal-day.negative { border-color: var(--red); background: #2d1117; }
+  .cal-day.has-record  { border-color: var(--green);  background: #0d2e1a; }
+  .cal-day.negative    { border-color: var(--red);    background: #2d1117; }
   .cal-day.sunday-worked { border-color: var(--yellow); background: #2d2000; }
+  .cal-day.holiday     { border-color: var(--teal);   background: #0d2e2e; }
+  .cal-day.holiday-worked { border-color: var(--yellow); background: #2d2000; }
 
-  .cal-day .day-hours {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 2px;
+  .cal-day .day-hours { font-size: 10px; color: var(--muted); }
+  .cal-day.has-record .day-hours   { color: var(--green); }
+  .cal-day.negative .day-hours     { color: var(--red); }
+  .cal-day .day-holiday-name {
+    font-size: 9px;
+    color: var(--teal);
+    text-align: center;
+    max-width: 90%;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-
-  .cal-day.has-record .day-hours { color: var(--green); }
-  .cal-day.negative .day-hours { color: var(--red); }
 
   /* Table */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+  table { width: 100%; border-collapse: collapse; }
 
   th {
     text-align: left;
@@ -286,37 +272,23 @@
     border-bottom: 1px solid var(--border);
   }
 
-  td {
-    padding: 12px;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
-
+  td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: var(--surface2); }
 
-  .badge {
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  .badge-green { background: #0d2e1a; color: var(--green); }
-  .badge-red { background: #2d1117; color: var(--red); }
+  .badge { padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+  .badge-green  { background: #0d2e1a; color: var(--green); }
+  .badge-red    { background: #2d1117; color: var(--red); }
   .badge-yellow { background: #2d2000; color: var(--yellow); }
+  .badge-teal   { background: #0d2e2e; color: var(--teal); }
 
   /* CLT rules */
-  .rule-block {
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 14px;
-  }
-
+  .rule-block { border-radius: 10px; padding: 16px; margin-bottom: 14px; }
   .rule-block.yellow-bg { background: #2d2000; border: 1px solid #5a3e00; }
-  .rule-block.red-bg { background: #2d1117; border: 1px solid #5a1520; }
-  .rule-block.green-bg { background: #0d2e1a; border: 1px solid #145230; }
-  .rule-block.blue-bg { background: #0d1f3c; border: 1px solid #1a3a6e; }
+  .rule-block.red-bg    { background: #2d1117; border: 1px solid #5a1520; }
+  .rule-block.green-bg  { background: #0d2e1a; border: 1px solid #145230; }
+  .rule-block.blue-bg   { background: #0d1f3c; border: 1px solid #1a3a6e; }
+  .rule-block.teal-bg   { background: #0d2e2e; border: 1px solid #145250; }
 
   .rule-block h3 { font-size: 15px; margin-bottom: 10px; }
   .rule-block ul { list-style: none; padding: 0; }
@@ -331,12 +303,7 @@
     margin-bottom: 20px;
   }
 
-  .form-group label {
-    display: block;
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
+  .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
 
   .form-group input {
     width: 100%;
@@ -352,19 +319,10 @@
 
   .form-group input:focus { border-color: var(--purple); }
 
-  .btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: opacity .15s;
-  }
-
+  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: opacity .15s; }
   .btn:hover { opacity: .85; }
   .btn-primary { background: var(--purple); color: #fff; }
-  .btn-danger { background: #8b1a1a; color: #fca5a5; border: 1px solid #b91c1c; }
+  .btn-danger  { background: #8b1a1a; color: #fca5a5; border: 1px solid #b91c1c; }
 
   /* Modal */
   .overlay {
@@ -386,20 +344,14 @@
     padding: 28px;
     width: 100%;
     max-width: 420px;
-    position: relative;
   }
 
   .modal h3 { font-size: 18px; margin-bottom: 4px; }
   .modal .modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-
+  .modal .modal-holiday { color: var(--teal); font-size: 13px; margin-bottom: 8px; }
   .modal .form-group { margin-bottom: 14px; }
 
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 20px;
-  }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
   .btn-ghost {
     background: transparent;
@@ -421,16 +373,26 @@
   }
 
   .consol-row:last-child { border-bottom: none; }
-
   .consol-month { font-size: 14px; }
-  .consol-stats { display: flex; gap: 20px; font-size: 13px; color: var(--muted); }
+  .consol-stats { display: flex; gap: 16px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+
+  /* Acumulado total */
+  .acum-bar {
+    background: var(--surface2);
+    border: 1px solid var(--purple);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .acum-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .acum-value { font-size: 24px; font-weight: 700; }
 
   /* Week summary */
-  .week-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .week-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
   .week-day-chip {
     background: var(--surface2);
@@ -442,8 +404,24 @@
     min-width: 90px;
   }
 
-  .week-day-chip .wdc-day { font-weight: 600; margin-bottom: 2px; }
+  .week-day-chip.has-record { border-color: var(--green); }
+  .week-day-chip.is-holiday { border-color: var(--teal); }
+  .week-day-chip .wdc-day   { font-weight: 600; margin-bottom: 2px; }
   .week-day-chip .wdc-hours { font-size: 12px; color: var(--muted); }
+
+  /* Feriados list */
+  .holiday-list { display: flex; flex-direction: column; gap: 6px; }
+  .holiday-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 13px;
+    border-left: 3px solid var(--teal);
+  }
+  .holiday-item .hi-name { color: var(--text); }
+  .holiday-item .hi-date { color: var(--muted); }
 
   /* Toast */
   #toast {
@@ -464,7 +442,7 @@
 
   #toast.show { opacity: 1; transform: translateY(0); }
   #toast.success { border-color: var(--green); color: var(--green); }
-  #toast.error { border-color: var(--red); color: var(--red); }
+  #toast.error   { border-color: var(--red);   color: var(--red);   }
 </style>
 </head>
 <body>
@@ -479,6 +457,7 @@
   <button class="nav-btn" onclick="goTo('registrar')">Registrar Ponto</button>
   <button class="nav-btn" onclick="goTo('historico')">Histórico</button>
   <button class="nav-btn" onclick="goTo('regras')">Regras CLT</button>
+  <button class="nav-btn" onclick="goTo('feriados')">Feriados</button>
   <button class="nav-btn" onclick="goTo('config')">Configurações</button>
 </nav>
 
@@ -496,6 +475,7 @@
 
     <div class="box">
       <div class="box-title">Consolidado Geral <span class="tag tag-purple">Todos os meses</span></div>
+      <div id="acumTotal"></div>
       <div id="consolGeral"></div>
     </div>
 
@@ -527,7 +507,6 @@
       <h2 id="histMonthLabel"></h2>
       <button class="icon-btn" onclick="histMonth(1)">→</button>
     </div>
-
     <div class="box">
       <div class="box-title">Registros do Mês</div>
       <div id="histTable"></div>
@@ -550,7 +529,7 @@
       <div class="rule-block red-bg">
         <h3 style="color:var(--red)">O que acontece se trabalhar no domingo?</h3>
         <ul>
-          <li style="color:var(--red)"><b>Opção 1 – Compensação:</b><br><span style="color:var(--muted);padding-left:0">Folga em outro dia da semana seguinte. Deve ser acordado com o empregador.</span></li>
+          <li style="color:var(--red)"><b>Opção 1 – Compensação:</b><br><span style="color:var(--muted)">Folga em outro dia da semana seguinte. Deve ser acordado com o empregador.</span></li>
           <li style="color:var(--red);margin-top:8px"><b>Opção 2 – Pagamento em dobro (Art. 9° da Lei 605/49):</b><br><span style="color:var(--muted)">O empregador deve pagar 100% a mais pelas horas no domingo (hora dupla).</span></li>
           <li style="color:var(--red);margin-top:8px"><b>Opção 3 – Banco de Horas:</b><br><span style="color:var(--muted)">Horas do domingo como horas extras 100%, compensadas em até 1 ano (acordo coletivo) ou 6 meses (individual).</span></li>
         </ul>
@@ -566,6 +545,15 @@
         </ul>
       </div>
 
+      <div class="rule-block teal-bg">
+        <h3 style="color:var(--teal)">Feriados Nacionais – Direitos</h3>
+        <ul>
+          <li>Feriados têm o mesmo tratamento que domingos: <b style="color:var(--text)">são dias de folga remunerada.</b></li>
+          <li>Se trabalhar em feriado: direito a pagamento em dobro ou folga compensatória.</li>
+          <li>Os feriados são marcados automaticamente no calendário conforme o calendário brasileiro.</li>
+        </ul>
+      </div>
+
       <div class="rule-block blue-bg">
         <h3 style="color:var(--blue)">⚠ Atenção – Escala 6x1 (Art. 59-A CLT)</h3>
         <ul>
@@ -575,8 +563,21 @@
         </ul>
       </div>
 
-      <div class="box-title" style="margin-top:8px">Domingos Registrados</div>
+      <div class="box-title" style="margin-top:8px">Domingos/Feriados Trabalhados</div>
       <div id="domingosList"></div>
+    </div>
+  </div>
+
+  <!-- FERIADOS -->
+  <div class="page" id="page-feriados">
+    <div class="month-nav">
+      <button class="icon-btn" onclick="feriadoYear(-1)">←</button>
+      <h2 id="feriadoYearLabel"></h2>
+      <button class="icon-btn" onclick="feriadoYear(1)">→</button>
+    </div>
+    <div class="box">
+      <div class="box-title">📅 Feriados Nacionais Brasileiros <span class="tag tag-teal" id="feriadoCount"></span></div>
+      <div id="feriadosList"></div>
     </div>
   </div>
 
@@ -626,6 +627,7 @@
 <div class="overlay" id="overlay" onclick="closeModal(event)">
   <div class="modal" id="modal">
     <h3 id="modalTitle"></h3>
+    <p class="modal-holiday" id="modalHoliday" style="display:none"></p>
     <p class="modal-sub" id="modalSub"></p>
 
     <div class="form-group">
@@ -653,22 +655,88 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
 <script>
-// ─── State ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// FERIADOS BRASILEIROS
+// ═══════════════════════════════════════════════════════
+
+// Calcula a Páscoa (algoritmo anônimo gregoriano)
+function calcEaster(y) {
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100;
+  const d = Math.floor(b / 4), e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31); // 1-based
+  const day   = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(y, month - 1, day);
+}
+
+function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+function dKey(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+// Retorna mapa { "YYYY-MM-DD": "Nome do Feriado" } para o ano y
+function getHolidays(y) {
+  const h = {};
+
+  // Fixos
+  const fixed = [
+    [`${y}-01-01`, 'Ano Novo'],
+    [`${y}-04-21`, 'Tiradentes'],
+    [`${y}-05-01`, 'Dia do Trabalho'],
+    [`${y}-09-07`, 'Independência do Brasil'],
+    [`${y}-10-12`, 'N. Sra. Aparecida'],
+    [`${y}-11-02`, 'Finados'],
+    [`${y}-11-15`, 'Proclamação da República'],
+    [`${y}-11-20`, 'Consciência Negra'],
+    [`${y}-12-25`, 'Natal'],
+  ];
+
+  fixed.forEach(([k, v]) => h[k] = v);
+
+  // Móveis baseados na Páscoa
+  const easter = calcEaster(y);
+  h[dKey(addDays(easter, -48))] = 'Carnaval (2ª feira)';
+  h[dKey(addDays(easter, -47))] = 'Carnaval (3ª feira)';
+  h[dKey(addDays(easter, -2))]  = 'Sexta-feira Santa';
+  h[dKey(easter)]                = 'Páscoa';
+  h[dKey(addDays(easter, 60))]  = 'Corpus Christi';
+
+  return h;
+}
+
+function isHoliday(dateStr) {
+  const y = parseInt(dateStr.split('-')[0]);
+  return getHolidays(y)[dateStr] || null; // retorna o nome ou null
+}
+
+// ═══════════════════════════════════════════════════════
+// ESTADO & CONFIG
+// ═══════════════════════════════════════════════════════
 const STORAGE_KEY = 'jornada_v1';
 const CONFIG_KEY  = 'jornada_cfg_v1';
 
 let state = {
-  records: {},   // "YYYY-MM-DD": { entrada, saida, intervalo, obs }
-  dashYear: new Date().getFullYear(),
+  records:   {},
+  dashYear:  new Date().getFullYear(),
   dashMonth: new Date().getMonth(),
-  calYear: new Date().getFullYear(),
-  calMonth: new Date().getMonth(),
-  histYear: new Date().getFullYear(),
+  calYear:   new Date().getFullYear(),
+  calMonth:  new Date().getMonth(),
+  histYear:  new Date().getFullYear(),
   histMonth: new Date().getMonth(),
+  ferYear:   new Date().getFullYear(),
 };
 
 let cfg = {
@@ -680,14 +748,14 @@ let modalDate = null;
 
 function load() {
   try { const d = JSON.parse(localStorage.getItem(STORAGE_KEY)); if (d) state.records = d; } catch(e){}
-  try { const c = JSON.parse(localStorage.getItem(CONFIG_KEY)); if (c) cfg = {...cfg, ...c}; } catch(e){}
+  try { const c = JSON.parse(localStorage.getItem(CONFIG_KEY));  if (c) cfg = {...cfg, ...c}; } catch(e){}
 }
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
-}
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records)); }
 
-// ─── Utils ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
 function pad(n) { return String(n).padStart(2,'0'); }
 
 function dateKey(y, m, d) { return `${y}-${pad(m+1)}-${pad(d)}`; }
@@ -700,39 +768,37 @@ function parseTime(t) {
 function formatMins(m) {
   const neg = m < 0;
   const abs = Math.abs(m);
-  const h = Math.floor(abs / 60);
+  const h   = Math.floor(abs / 60);
   const min = abs % 60;
   return (neg ? '-' : '+') + h + 'h' + (min ? pad(min) + 'm' : '');
 }
 
 function workedMins(rec) {
   if (!rec || !rec.entrada || !rec.saida) return 0;
-  const w = parseTime(rec.saida) - parseTime(rec.entrada) - (rec.intervalo || 0);
-  return Math.max(0, w);
+  return Math.max(0, parseTime(rec.saida) - parseTime(rec.entrada) - (rec.intervalo || 0));
 }
 
 function expectedMins(dateStr) {
-  const dow = new Date(dateStr + 'T00:00:00').getDay(); // 0=Sun
-  if (dow === 0) return 0;  // Domingo = folga
-  if (dow === 6) return (parseTime(cfg.saidaSab) - parseTime(cfg.entradaSab) - cfg.intervalSab);
-  return (parseTime(cfg.saidaSF) - parseTime(cfg.entradaSF) - cfg.intervalSF);
+  if (isHoliday(dateStr)) return 0;   // feriado = folga
+  const dow = new Date(dateStr + 'T00:00:00').getDay();
+  if (dow === 0) return 0;             // domingo = folga
+  if (dow === 6) return parseTime(cfg.saidaSab) - parseTime(cfg.entradaSab) - cfg.intervalSab;
+  return parseTime(cfg.saidaSF) - parseTime(cfg.entradaSF) - cfg.intervalSF;
 }
 
-function isSunday(y, m, d) { return new Date(y, m, d).getDay() === 0; }
+function isSunday(y, m, d)   { return new Date(y, m, d).getDay() === 0; }
 function isSaturday(y, m, d) { return new Date(y, m, d).getDay() === 6; }
 
 const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                      'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const DAY_NAMES = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+const DAY_NAMES   = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 
 function fmtMonthYear(y, m) { return MONTH_NAMES[m] + ' ' + y; }
+function today() { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth(), d: d.getDate() }; }
 
-function today() {
-  const d = new Date();
-  return { y: d.getFullYear(), m: d.getMonth(), d: d.getDate() };
-}
-
-// ─── Navigation ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════════════════════
 function goTo(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -741,46 +807,69 @@ function goTo(page) {
   render(page);
 }
 
-function dashMonth(dir) { state.dashMonth += dir; if (state.dashMonth < 0) { state.dashMonth=11; state.dashYear--; } if (state.dashMonth > 11) { state.dashMonth=0; state.dashYear++; } renderDashboard(); }
-function calMonth(dir)  { state.calMonth += dir;  if (state.calMonth < 0)  { state.calMonth=11;  state.calYear--;  } if (state.calMonth > 11)  { state.calMonth=0;  state.calYear++;  } renderCalendar(); }
-function histMonth(dir) { state.histMonth += dir; if (state.histMonth < 0) { state.histMonth=11; state.histYear--; } if (state.histMonth > 11) { state.histMonth=0; state.histYear++; } renderHistorico(); }
+function dashMonth(dir)  { state.dashMonth += dir; if (state.dashMonth < 0) { state.dashMonth=11; state.dashYear--; } if (state.dashMonth > 11) { state.dashMonth=0; state.dashYear++; } renderDashboard(); }
+function calMonth(dir)   { state.calMonth  += dir; if (state.calMonth  < 0) { state.calMonth=11;  state.calYear--;  } if (state.calMonth  > 11) { state.calMonth=0;  state.calYear++;  } renderCalendar(); }
+function histMonth(dir)  { state.histMonth += dir; if (state.histMonth < 0) { state.histMonth=11; state.histYear--; } if (state.histMonth > 11) { state.histMonth=0; state.histYear++; } renderHistorico(); }
+function feriadoYear(dir){ state.ferYear += dir; renderFeriados(); }
 
 function render(page) {
-  if (page === 'dashboard') renderDashboard();
+  if      (page === 'dashboard') renderDashboard();
   else if (page === 'registrar') renderCalendar();
   else if (page === 'historico') renderHistorico();
-  else if (page === 'regras') renderRegras();
-  else if (page === 'config') renderConfig();
+  else if (page === 'regras')    renderRegras();
+  else if (page === 'feriados')  renderFeriados();
+  else if (page === 'config')    renderConfig();
 }
 
-// ─── Dashboard ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// ACUMULADO GERAL (todos os registros)
+// ═══════════════════════════════════════════════════════
+function calcAcumulado() {
+  let totalW = 0, totalE = 0;
+  Object.entries(state.records).forEach(([k, rec]) => {
+    totalW += workedMins(rec);
+    totalE += expectedMins(k);
+  });
+  return totalW - totalE;
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
 function renderDashboard() {
   const y = state.dashYear, m = state.dashMonth;
   document.getElementById('dashMonthLabel').textContent = fmtMonthYear(y, m);
 
   const daysInMonth = new Date(y, m+1, 0).getDate();
-  let totalWorked = 0, totalExpected = 0, positivo = 0, negativo = 0;
-  let diasTrabalhados = 0, domingosTrabalhados = 0;
+  let totalWorked = 0, totalExpected = 0;
+  let diasTrabalhados = 0, domingosTrabalhados = 0, feriadosTrabalhados = 0;
 
   for (let d = 1; d <= daysInMonth; d++) {
     const key = dateKey(y, m, d);
     const rec = state.records[key];
-    const exp = expectedMins(key);
     if (rec) {
-      const w = workedMins(rec);
-      totalWorked += w;
+      const w   = workedMins(rec);
+      const exp = expectedMins(key);
+      totalWorked   += w;
       totalExpected += exp;
       diasTrabalhados++;
-      if (isSunday(y, m, d)) domingosTrabalhados++;
+      if (isSunday(y, m, d))   domingosTrabalhados++;
+      if (isHoliday(key))      feriadosTrabalhados++;
     }
   }
 
-  const saldo = totalWorked - totalExpected;
-  positivo = Math.max(0, saldo);
-  negativo = Math.min(0, saldo);
+  const saldo   = totalWorked - totalExpected;
+  const positivo = Math.max(0, saldo);
+  const negativo = Math.min(0, saldo);
+  const acumTotal = calcAcumulado();
 
   const cards = document.getElementById('dashCards');
   cards.innerHTML = `
+    <div class="card highlight">
+      <div class="card-label">Saldo Acumulado Geral</div>
+      <div class="card-value ${acumTotal >= 0 ? 'purple' : 'red'}">${formatMins(acumTotal)}</div>
+      <div class="card-sub">Todos os meses registrados</div>
+    </div>
     <div class="card">
       <div class="card-label">Saldo do Mês</div>
       <div class="card-value ${saldo >= 0 ? 'green' : 'red'}">${formatMins(saldo)}</div>
@@ -809,66 +898,98 @@ function renderDashboard() {
     <div class="card">
       <div class="card-label">Domingos Trabalhados</div>
       <div class="card-value yellow">${domingosTrabalhados}</div>
-      <div class="card-sub">${domingosTrabalhados === 0 ? 'Nenhum' : domingosTrabalhados === 1 ? '1 domingo' : domingosTrabalhados + ' domingos'}</div>
+      <div class="card-sub">${domingosTrabalhados === 0 ? 'Nenhum' : domingosTrabalhados + ' domingo(s)'}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Feriados Trabalhados</div>
+      <div class="card-value teal">${feriadosTrabalhados}</div>
+      <div class="card-sub">${feriadosTrabalhados === 0 ? 'Nenhum' : feriadosTrabalhados + ' feriado(s)'}</div>
     </div>
   `;
 
-  // Consolidado geral
+  // Acumulado total + consolidado por mês
+  const acumEl   = document.getElementById('acumTotal');
   const consolEl = document.getElementById('consolGeral');
-  const allKeys = Object.keys(state.records).sort();
-  if (!allKeys.length) { consolEl.innerHTML = '<div class="empty">Nenhum registro ainda.</div>'; }
-  else {
+  const allKeys  = Object.keys(state.records).sort();
+
+  if (!allKeys.length) {
+    acumEl.innerHTML  = '';
+    consolEl.innerHTML = '<div class="empty">Nenhum registro ainda.</div>';
+  } else {
+    // Barra de acumulado
+    acumEl.innerHTML = `
+      <div class="acum-bar">
+        <div>
+          <div class="acum-label">Saldo Acumulado Total</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${allKeys.length} dias registrados em todos os meses</div>
+        </div>
+        <div class="acum-value ${acumTotal >= 0 ? 'purple' : 'red'}">${formatMins(acumTotal)}</div>
+      </div>
+    `;
+
+    // Por mês
     const monthMap = {};
     allKeys.forEach(k => {
       const [ky, km] = k.split('-');
       const mk = ky + '-' + km;
-      if (!monthMap[mk]) monthMap[mk] = { y: +ky, m: +km-1, worked: 0, days: 0 };
-      monthMap[mk].worked += workedMins(state.records[k]);
+      if (!monthMap[mk]) monthMap[mk] = { y: +ky, m: +km-1, worked: 0, expected: 0, days: 0 };
+      monthMap[mk].worked   += workedMins(state.records[k]);
+      monthMap[mk].expected += expectedMins(k);
       monthMap[mk].days++;
     });
+
     consolEl.innerHTML = Object.entries(monthMap).reverse().map(([mk, v]) => {
+      const s = v.worked - v.expected;
       return `<div class="consol-row">
         <span class="consol-month">${fmtMonthYear(v.y, v.m)}</span>
         <span class="consol-stats">
           <span>${v.days} dias</span>
           <span class="blue">${formatMins(v.worked).replace('+','')} trabalhadas</span>
+          <span class="${s >= 0 ? 'green' : 'red'}">${formatMins(s)} saldo</span>
         </span>
       </div>`;
     }).join('');
   }
 
   // Semana atual
-  const weekEl = document.getElementById('weekSummary');
-  const todayD = new Date();
-  const dayOfWeek = todayD.getDay(); // 0=Sun
+  const weekEl    = document.getElementById('weekSummary');
+  const todayD    = new Date();
+  const dayOfWeek = todayD.getDay();
   const startOfWeek = new Date(todayD);
   startOfWeek.setDate(todayD.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
 
   let weekHtml = '<div class="week-row">';
   let hasWeekData = false;
+
   for (let i = 0; i < 7; i++) {
-    const d = new Date(startOfWeek);
+    const d  = new Date(startOfWeek);
     d.setDate(startOfWeek.getDate() + i);
-    const k = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    const k  = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     const rec = state.records[k];
-    const dn = DAY_NAMES[d.getDay()];
-    const w = rec ? workedMins(rec) : null;
+    const hn  = isHoliday(k);
+    const dn  = DAY_NAMES[d.getDay()];
+    const w   = rec ? workedMins(rec) : null;
     if (rec) hasWeekData = true;
-    weekHtml += `<div class="week-day-chip ${rec ? 'has-record' : ''}">
+    let cls = 'week-day-chip';
+    if (rec) cls += ' has-record';
+    else if (hn) cls += ' is-holiday';
+    weekHtml += `<div class="${cls}">
       <div class="wdc-day">${dn} ${d.getDate()}</div>
-      <div class="wdc-hours">${w !== null ? formatMins(w).replace('+','') : '—'}</div>
+      <div class="wdc-hours">${hn && !rec ? '🎉 Feriado' : w !== null ? formatMins(w).replace('+','') : '—'}</div>
     </div>`;
   }
+
   weekHtml += '</div>';
   weekEl.innerHTML = hasWeekData ? weekHtml : '<div class="empty">Nenhum registro esta semana.</div>';
 }
 
-// ─── Calendar ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// CALENDÁRIO
+// ═══════════════════════════════════════════════════════
 function renderCalendar() {
   const y = state.calYear, m = state.calMonth;
   document.getElementById('calMonthLabel').textContent = fmtMonthYear(y, m);
 
-  // Info chips
   const info = document.getElementById('calInfo');
   info.innerHTML = `
     <div class="schedule-chip">Seg–Sex: <b>${cfg.entradaSF} – ${cfg.saidaSF}</b> (${((parseTime(cfg.saidaSF)-parseTime(cfg.entradaSF)-cfg.intervalSF)/60).toFixed(0)}h)</div>
@@ -876,70 +997,87 @@ function renderCalendar() {
     <div class="schedule-chip">Domingo: <b style="color:var(--purple-light)">Folga (6x1)</b></div>
     <div class="cal-legend"><span class="dot" style="background:var(--green)"></span> Com registro</div>
     <div class="cal-legend"><span class="dot" style="background:var(--red)"></span> Negativo</div>
-    <div class="cal-legend"><span class="dot" style="background:var(--yellow)"></span> Domingo trab.</div>
+    <div class="cal-legend"><span class="dot" style="background:var(--yellow)"></span> Dom/Fer trabalhado</div>
+    <div class="cal-legend"><span class="dot" style="background:var(--teal)"></span> Feriado</div>
   `;
 
   const cal = document.getElementById('calendar');
   cal.innerHTML = '';
 
-  // Headers
   ['SEG','TER','QUA','QUI','SEX','SÁB','DOM'].forEach(d => {
     cal.innerHTML += `<div class="cal-header">${d}</div>`;
   });
 
-  const firstDay = new Date(y, m, 1).getDay(); // 0=Sun
-  // Convert to Mon=0
-  const offset = (firstDay === 0) ? 6 : firstDay - 1;
-
+  const firstDay    = new Date(y, m, 1).getDay();
+  const offset      = (firstDay === 0) ? 6 : firstDay - 1;
   const daysInMonth = new Date(y, m+1, 0).getDate();
   const t = today();
 
-  // Empty cells
-  for (let i = 0; i < offset; i++) {
-    cal.innerHTML += '<div class="cal-day disabled"></div>';
-  }
+  for (let i = 0; i < offset; i++) cal.innerHTML += '<div class="cal-day disabled"></div>';
 
   for (let d = 1; d <= daysInMonth; d++) {
-    const key = dateKey(y, m, d);
-    const rec = state.records[key];
-    const dow = new Date(y, m, d).getDay();
+    const key  = dateKey(y, m, d);
+    const rec  = state.records[key];
+    const dow  = new Date(y, m, d).getDay();
     const isSun = dow === 0;
-    const w = rec ? workedMins(rec) : 0;
-    const exp = expectedMins(key);
+    const hn   = isHoliday(key);
+    const isFolga = isSun || (hn && !rec);
+    const w    = rec ? workedMins(rec) : 0;
+    const exp  = expectedMins(key);
     const saldo = w - exp;
 
     let cls = 'cal-day';
     if (y === t.y && m === t.m && d === t.d) cls += ' today';
     if (isSun) cls += ' sunday';
+
     if (rec) {
-      if (isSun) cls += ' sunday-worked';
+      if (isSun || hn) cls += ' holiday-worked';
       else if (saldo < 0) cls += ' negative';
       else cls += ' has-record';
+    } else if (hn) {
+      cls += ' holiday';
     }
 
-    const hoursLabel = rec ? `<div class="day-hours">${formatMins(w).replace('+','')}${!isSun ? ' / '+formatMins(exp).replace('+','') : ''}</div>` : '';
+    const hoursLabel = rec
+      ? `<div class="day-hours">${formatMins(w).replace('+','')}${(!isSun && !hn) ? ' / '+formatMins(exp).replace('+','') : ''}</div>`
+      : '';
 
-    cal.innerHTML += `<div class="${cls}" onclick="openModal('${key}')">${d}${hoursLabel}</div>`;
+    const holidayLabel = hn
+      ? `<div class="day-holiday-name">${hn}</div>`
+      : '';
+
+    cal.innerHTML += `<div class="${cls}" onclick="openModal('${key}')">${d}${hoursLabel}${holidayLabel}</div>`;
   }
 }
 
-// ─── Modal ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════
 function openModal(dateStr) {
   modalDate = dateStr;
   const [y, mo, d] = dateStr.split('-').map(Number);
-  const dow = new Date(y, mo-1, d).getDay();
-  const dayName = DAY_NAMES[dow];
+  const dow  = new Date(y, mo-1, d).getDay();
+  const dn   = DAY_NAMES[dow];
   const isSun = dow === 0;
   const isSat = dow === 6;
+  const hn   = isHoliday(dateStr);
 
-  document.getElementById('modalTitle').textContent = `${dayName}, ${d} de ${MONTH_NAMES[mo-1]} de ${y}`;
-  document.getElementById('modalSub').textContent = isSun ? 'Domingo – dia de folga (6x1). Registrar mesmo assim?' : `Escala: ${isSat ? cfg.entradaSab+' – '+cfg.saidaSab : cfg.entradaSF+' – '+cfg.saidaSF}`;
+  document.getElementById('modalTitle').textContent = `${dn}, ${d} de ${MONTH_NAMES[mo-1]} de ${y}`;
+
+  const holEl = document.getElementById('modalHoliday');
+  if (hn) { holEl.textContent = '🎉 Feriado: ' + hn; holEl.style.display = ''; }
+  else    { holEl.style.display = 'none'; }
+
+  const subMsg = (isSun || hn)
+    ? 'Dia de folga. Registrar mesmo assim?'
+    : `Escala: ${isSat ? cfg.entradaSab+' – '+cfg.saidaSab : cfg.entradaSF+' – '+cfg.saidaSF}`;
+  document.getElementById('modalSub').textContent = subMsg;
 
   const rec = state.records[dateStr];
-  document.getElementById('mEntrada').value = rec ? rec.entrada : (isSat ? cfg.entradaSab : isSun ? '' : cfg.entradaSF);
-  document.getElementById('mSaida').value = rec ? rec.saida : (isSat ? cfg.saidaSab : isSun ? '' : cfg.saidaSF);
-  document.getElementById('mIntervalo').value = rec ? rec.intervalo : (isSat ? cfg.intervalSab : isSun ? 0 : cfg.intervalSF);
-  document.getElementById('mObs').value = rec ? (rec.obs || '') : '';
+  document.getElementById('mEntrada').value   = rec ? rec.entrada  : (isSat ? cfg.entradaSab : (isSun||hn) ? '' : cfg.entradaSF);
+  document.getElementById('mSaida').value     = rec ? rec.saida    : (isSat ? cfg.saidaSab   : (isSun||hn) ? '' : cfg.saidaSF);
+  document.getElementById('mIntervalo').value = rec ? rec.intervalo: (isSat ? cfg.intervalSab : (isSun||hn) ? 0 : cfg.intervalSF);
+  document.getElementById('mObs').value       = rec ? (rec.obs||'') : '';
   document.getElementById('btnExcluir').style.display = rec ? '' : 'none';
 
   document.getElementById('overlay').classList.add('open');
@@ -953,7 +1091,7 @@ function closeModal(e) {
 
 function salvarRegistro() {
   const entrada = document.getElementById('mEntrada').value;
-  const saida = document.getElementById('mSaida').value;
+  const saida   = document.getElementById('mSaida').value;
   if (!entrada || !saida) { showToast('Preencha entrada e saída.', 'error'); return; }
   if (parseTime(saida) <= parseTime(entrada)) { showToast('Saída deve ser após a entrada.', 'error'); return; }
 
@@ -978,7 +1116,9 @@ function excluirRegistro() {
   showToast('Registro excluído.', 'success');
 }
 
-// ─── Histórico ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// HISTÓRICO
+// ═══════════════════════════════════════════════════════
 function renderHistorico() {
   const y = state.histYear, m = state.histMonth;
   document.getElementById('histMonthLabel').textContent = fmtMonthYear(y, m);
@@ -990,57 +1130,66 @@ function renderHistorico() {
     const key = dateKey(y, m, d);
     const rec = state.records[key];
     if (!rec) continue;
-    const dow = new Date(y, m, d).getDay();
-    const w = workedMins(rec);
-    const exp = expectedMins(key);
+    const dow  = new Date(y, m, d).getDay();
+    const w    = workedMins(rec);
+    const exp  = expectedMins(key);
     const saldo = w - exp;
     const isSun = dow === 0;
-
-    rows.push({ key, d, dow, rec, w, exp, saldo, isSun });
+    const hn   = isHoliday(key);
+    rows.push({ key, d, dow, rec, w, exp, saldo, isSun, hn });
   }
 
   const el = document.getElementById('histTable');
-  if (!rows.length) { el.innerHTML = `<table><thead><tr><th>DATA</th><th>DIA</th><th>ENTRADA</th><th>SAÍDA</th><th>INTERVALO</th><th>TRABALHADO</th><th>ESPERADO</th><th>SALDO</th><th>OBS</th></tr></thead></table><div class="empty">Nenhum registro para este mês.</div>`; return; }
+  if (!rows.length) {
+    el.innerHTML = `<table><thead><tr><th>DATA</th><th>DIA</th><th>ENTRADA</th><th>SAÍDA</th><th>INTERVALO</th><th>TRABALHADO</th><th>ESPERADO</th><th>SALDO</th><th>OBS</th></tr></thead></table><div class="empty">Nenhum registro para este mês.</div>`;
+    return;
+  }
 
   el.innerHTML = `<table>
     <thead><tr><th>DATA</th><th>DIA</th><th>ENTRADA</th><th>SAÍDA</th><th>INTERVALO</th><th>TRABALHADO</th><th>ESPERADO</th><th>SALDO</th><th>OBS</th></tr></thead>
     <tbody>
     ${rows.map(r => `<tr>
-      <td>${pad(r.d)}/${pad(m+1)}/${y}</td>
+      <td>${pad(r.d)}/${pad(m+1)}/${y}${r.hn ? ' <span class="badge badge-teal" title="${r.hn}">🎉</span>' : ''}</td>
       <td>${DAY_NAMES[r.dow]}</td>
       <td>${r.rec.entrada}</td>
       <td>${r.rec.saida}</td>
       <td>${r.rec.intervalo}min</td>
       <td>${formatMins(r.w).replace('+','')}</td>
-      <td>${r.isSun ? 'Folga' : formatMins(r.exp).replace('+','')}</td>
+      <td>${(r.isSun||r.hn) ? 'Folga' : formatMins(r.exp).replace('+','')}</td>
       <td><span class="badge ${r.saldo >= 0 ? 'badge-green' : 'badge-red'}">${formatMins(r.saldo)}</span></td>
-      <td style="color:var(--muted)">${r.rec.obs || '—'}</td>
+      <td style="color:var(--muted)">${r.rec.obs || (r.hn ? r.hn : '—')}</td>
     </tr>`).join('')}
     </tbody>
   </table>`;
 }
 
-// ─── Regras ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// REGRAS
+// ═══════════════════════════════════════════════════════
 function renderRegras() {
-  const domingos = Object.entries(state.records).filter(([k]) => {
+  const especiais = Object.entries(state.records).filter(([k]) => {
     const [y, m, d] = k.split('-').map(Number);
-    return new Date(y, m-1, d).getDay() === 0;
+    return new Date(y, m-1, d).getDay() === 0 || isHoliday(k);
   });
 
   const el = document.getElementById('domingosList');
-  if (!domingos.length) { el.innerHTML = '<div class="empty">Nenhum domingo trabalhado registrado.</div>'; return; }
+  if (!especiais.length) { el.innerHTML = '<div class="empty">Nenhum domingo ou feriado trabalhado registrado.</div>'; return; }
 
   el.innerHTML = `<table>
-    <thead><tr><th>DATA</th><th>ENTRADA</th><th>SAÍDA</th><th>TRABALHADO</th><th>OBS</th></tr></thead>
+    <thead><tr><th>DATA</th><th>TIPO</th><th>ENTRADA</th><th>SAÍDA</th><th>TRABALHADO</th><th>OBS</th></tr></thead>
     <tbody>
-    ${domingos.sort().map(([k, rec]) => {
+    ${especiais.sort().map(([k, rec]) => {
       const [y, m, d] = k.split('-').map(Number);
+      const dow = new Date(y, m-1, d).getDay();
+      const hn  = isHoliday(k);
+      const tipo = hn ? `🎉 ${hn}` : '🌅 Domingo';
       const w = workedMins(rec);
       return `<tr>
         <td>${pad(d)}/${m}/${y}</td>
+        <td class="${hn ? 'teal' : 'yellow'}">${tipo}</td>
         <td>${rec.entrada}</td>
         <td>${rec.saida}</td>
-        <td class="yellow">${formatMins(w).replace('+','')}</td>
+        <td class="${hn ? 'teal' : 'yellow'}">${formatMins(w).replace('+','')}</td>
         <td style="color:var(--muted)">${rec.obs || '—'}</td>
       </tr>`;
     }).join('')}
@@ -1048,22 +1197,50 @@ function renderRegras() {
   </table>`;
 }
 
-// ─── Config ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// FERIADOS (aba)
+// ═══════════════════════════════════════════════════════
+function renderFeriados() {
+  const y = state.ferYear;
+  document.getElementById('feriadoYearLabel').textContent = String(y);
+  const holidays = getHolidays(y);
+  const sorted = Object.entries(holidays).sort(([a], [b]) => a.localeCompare(b));
+  document.getElementById('feriadoCount').textContent = sorted.length + ' feriados';
+
+  const dow_names = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  document.getElementById('feriadosList').innerHTML = `<div class="holiday-list">
+    ${sorted.map(([k, name]) => {
+      const dt  = new Date(k + 'T00:00:00');
+      const dn  = dow_names[dt.getDay()];
+      const [yy, mm, dd] = k.split('-');
+      const worked = state.records[k];
+      return `<div class="holiday-item">
+        <span class="hi-name">🎉 ${name}${worked ? ' <span class="badge badge-yellow">Trabalhado</span>' : ''}</span>
+        <span class="hi-date">${dn}, ${dd}/${mm}/${yy}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════
 function renderConfig() {
-  document.getElementById('cfgEntradaSF').value = cfg.entradaSF;
-  document.getElementById('cfgSaidaSF').value = cfg.saidaSF;
-  document.getElementById('cfgIntervalSF').value = cfg.intervalSF;
-  document.getElementById('cfgEntradaSab').value = cfg.entradaSab;
-  document.getElementById('cfgSaidaSab').value = cfg.saidaSab;
+  document.getElementById('cfgEntradaSF').value   = cfg.entradaSF;
+  document.getElementById('cfgSaidaSF').value     = cfg.saidaSF;
+  document.getElementById('cfgIntervalSF').value  = cfg.intervalSF;
+  document.getElementById('cfgEntradaSab').value  = cfg.entradaSab;
+  document.getElementById('cfgSaidaSab').value    = cfg.saidaSab;
   document.getElementById('cfgIntervalSab').value = cfg.intervalSab;
 }
 
 function saveConfig() {
-  cfg.entradaSF = document.getElementById('cfgEntradaSF').value;
-  cfg.saidaSF   = document.getElementById('cfgSaidaSF').value;
-  cfg.intervalSF = parseInt(document.getElementById('cfgIntervalSF').value) || 0;
-  cfg.entradaSab = document.getElementById('cfgEntradaSab').value;
-  cfg.saidaSab   = document.getElementById('cfgSaidaSab').value;
+  cfg.entradaSF   = document.getElementById('cfgEntradaSF').value;
+  cfg.saidaSF     = document.getElementById('cfgSaidaSF').value;
+  cfg.intervalSF  = parseInt(document.getElementById('cfgIntervalSF').value) || 0;
+  cfg.entradaSab  = document.getElementById('cfgEntradaSab').value;
+  cfg.saidaSab    = document.getElementById('cfgSaidaSab').value;
   cfg.intervalSab = parseInt(document.getElementById('cfgIntervalSab').value) || 0;
   localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
   showToast('Configurações salvas!', 'success');
@@ -1076,7 +1253,9 @@ function confirmClear() {
   showToast('Todos os registros foram apagados.', 'success');
 }
 
-// ─── Toast ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
 let toastTimer;
 function showToast(msg, type) {
   const el = document.getElementById('toast');
@@ -1086,7 +1265,9 @@ function showToast(msg, type) {
   toastTimer = setTimeout(() => el.className = '', 2500);
 }
 
-// ─── Header date ────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
 function updateHeaderDate() {
   const d = new Date();
   const days = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
@@ -1094,7 +1275,6 @@ function updateHeaderDate() {
     days[d.getDay()] + ', ' + pad(d.getDate()) + ' de ' + MONTH_NAMES[d.getMonth()] + ' de ' + d.getFullYear();
 }
 
-// ─── Init ───────────────────────────────────────────────
 load();
 updateHeaderDate();
 renderDashboard();
