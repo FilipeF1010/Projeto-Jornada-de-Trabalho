@@ -769,11 +769,9 @@ function renderDashboard() {
     if (rec) {
       const w = workedMins(rec);
       totalWorked += w;
+      totalExpected += exp;
       diasTrabalhados++;
       if (isSunday(y, m, d)) domingosTrabalhados++;
-    }
-    if (!isSunday(y, m, d) && new Date(y, m, d) <= new Date()) {
-      totalExpected += exp;
     }
   }
 
