@@ -22,6 +22,8 @@
     --blue: #58a6ff;
     --teal: #2dd4bf;
     --orange: #f97316;
+    --ferias: #e879f9;
+    --ferias-bg: #2d0a38;
   }
 
   body {
@@ -73,7 +75,7 @@
 
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
   .card.highlight-purple { border-color: var(--purple); background: #1a1035; }
-  .card.highlight-orange { border-color: var(--orange); background: #1f1208; }
+  .card.highlight-orange { border-color: var(--ferias); background: var(--ferias-bg); }
 
   .card-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
   .card-value { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
@@ -150,12 +152,12 @@
   .cal-day.negative      { border-color: var(--red);    background: #2d1117; }
   .cal-day.folga-worked  { border-color: var(--yellow); background: #2d2000; }
   .cal-day.holiday       { border-color: var(--teal);   background: #0d2e2e; }
-  .cal-day.ferias-day    { border-color: var(--orange); background: #2d1800; }
+  .cal-day.ferias-day    { border-color: var(--ferias); background: var(--ferias-bg); border-width: 2px; }
 
   .cal-day .day-hours        { font-size: 10px; color: var(--muted); }
   .cal-day.has-record .day-hours  { color: var(--green); }
   .cal-day.negative .day-hours    { color: var(--red); }
-  .cal-day.ferias-day .day-hours  { color: var(--orange); }
+  .cal-day.ferias-day .day-hours  { color: var(--ferias); }
 
   .cal-day .day-label {
     font-size: 9px;
@@ -168,7 +170,7 @@
   }
 
   .cal-day.holiday   .day-label { color: var(--teal); }
-  .cal-day.ferias-day .day-label { color: var(--orange); }
+  .cal-day.ferias-day .day-label { color: var(--ferias); }
 
   /* Table */
   table { width: 100%; border-collapse: collapse; }
@@ -247,7 +249,7 @@
   .week-day-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 13px; flex: 1; min-width: 90px; }
   .week-day-chip.has-record { border-color: var(--green); }
   .week-day-chip.is-holiday { border-color: var(--teal); }
-  .week-day-chip.is-ferias  { border-color: var(--orange); background: #2d1800; }
+  .week-day-chip.is-ferias  { border-color: var(--ferias); background: var(--ferias-bg); }
   .week-day-chip .wdc-day   { font-weight: 600; margin-bottom: 2px; }
   .week-day-chip .wdc-hours { font-size: 12px; color: var(--muted); }
 
@@ -1099,7 +1101,7 @@ function renderCalendar(){
     <div class="schedule-chip">Domingo: <b style="color:var(--purple-light)">Folga (6x1)</b></div>
     <div class="cal-legend"><span class="dot" style="background:var(--green)"></span> Com registro</div>
     <div class="cal-legend"><span class="dot" style="background:var(--red)"></span> Negativo</div>
-    <div class="cal-legend"><span class="dot" style="background:var(--orange)"></span> Férias</div>
+    <div class="cal-legend"><span class="dot" style="background:var(--ferias)"></span> Férias</div>
     <div class="cal-legend"><span class="dot" style="background:var(--teal)"></span> Feriado</div>
     <div class="cal-legend"><span class="dot" style="background:var(--yellow)"></span> Dom/Fer trabalhado</div>
   `;
@@ -1372,10 +1374,10 @@ function renderFeriasCalendar(){
     const t=today();
     if(y===t.y&&m===t.m&&d===t.d) cls+=' today';
     if(isSun) cls+=' sunday';
-    if(fer)   cls+=' ferias-day';
+    if(fer)     cls+=' ferias-day';
     else if(hn) cls+=' holiday';
 
-    const lbl=fer?'<div class="day-label">🏖 Férias</div>':hn?`<div class="day-label">${hn}</div>`:'';
+    const lbl=fer?'<div class="day-label" style="color:var(--ferias)">🏖 Férias</div>':hn?`<div class="day-label">${hn}</div>`:'';
     return `<div class="${cls}">${d}${lbl}</div>`;
   });
 }
