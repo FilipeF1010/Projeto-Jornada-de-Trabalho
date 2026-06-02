@@ -510,7 +510,7 @@
       <div class="form-grid">
         <div class="form-group"><label>Entrada Seg–Sex</label><input type="time" id="cfgEntradaSF" value="14:00"></div>
         <div class="form-group"><label>Saída Seg–Sex</label><input type="time" id="cfgSaidaSF" value="22:00"></div>
-        <div class="form-group"><label>Intervalo Seg–Sex (min)</label><input type="number" id="cfgIntervalSF" value="60" min="0"></div>
+        <div class="form-group"><label>Intervalo Seg–Sex (min)</label><input type="number" id="cfgIntervalSF" value="0" min="0"></div>
         <div class="form-group"><label>Entrada Sábado</label><input type="time" id="cfgEntradaSab" value="09:00"></div>
         <div class="form-group"><label>Saída Sábado</label><input type="time" id="cfgSaidaSab" value="13:00"></div>
         <div class="form-group"><label>Intervalo Sábado (min)</label><input type="number" id="cfgIntervalSab" value="0" min="0"></div>
@@ -637,7 +637,7 @@ let state = {
 };
 
 let cfg = {
-  entradaSF:'14:00', saidaSF:'22:00', intervalSF:60,
+  entradaSF:'14:00', saidaSF:'22:00', intervalSF:0,
   entradaSab:'09:00', saidaSab:'13:00', intervalSab:0,
   feriasDias: 30,
 };
@@ -1424,7 +1424,7 @@ function popularDadosTeste(){
           state.records[key]={entrada:`08:${pad(randInt(30,55))}`,saida:'13:00',intervalo:0,obs:''};
         } else {
           // Seg–Sex
-          state.records[key]={entrada:`13:${pad(randInt(45,56))}`,saida:'22:00',intervalo:60,obs:''};
+          state.records[key]={entrada:`13:${pad(randInt(45,56))}`,saida:'22:00',intervalo:0,obs:''};
         }
         total++;
       }
