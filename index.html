@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Jornada</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2d333b;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --purple: #7c3aed;
+    --purple-light: #a78bfa;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --blue: #58a6ff;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--purple-light);
+  }
+
+  .logo span { font-size: 20px; }
+
+  .date-display {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* Nav */
+  nav {
+    display: flex;
+    gap: 8px;
+    padding: 20px 24px 0;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all .15s;
+  }
+
+  .nav-btn:hover { background: var(--surface2); }
+
+  .nav-btn.active {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+  }
+
+  /* Main content */
+  main {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Cards grid */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .card-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .card-sub { font-size: 13px; color: var(--muted); }
+
+  .green { color: var(--green); }
+  .red { color: var(--red); }
+  .blue { color: var(--blue); }
+  .yellow { color: var(--yellow); }
+
+  /* Month nav */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .month-nav h2 { font-size: 18px; font-weight: 600; min-width: 140px; text-align: center; }
+
+  .icon-btn {
+    width: 36px; height: 36px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+
+  .icon-btn:hover { background: var(--border); }
+
+  /* Section box */
+  .box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .box-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .tag-purple { background: #3b1f6e; color: var(--purple-light); }
+  .tag-yellow { background: #3d2a00; color: var(--yellow); }
+
+  .empty { text-align: center; color: var(--muted); padding: 32px 0; }
+
+  /* Calendar */
+  .cal-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .cal-legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .cal-legend .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .schedule-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .schedule-chip b { color: var(--purple-light); }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .cal-header {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 4px 0;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .15s;
+    font-size: 15px;
+    font-weight: 500;
+    position: relative;
+    min-height: 64px;
+  }
+
+  .cal-day:hover:not(.disabled) { border-color: var(--purple); background: #1e1535; }
+  .cal-day.today { border-color: var(--purple); border-width: 2px; }
+  .cal-day.disabled { opacity: .3; cursor: default; }
+  .cal-day.sunday { color: var(--muted); }
+
+  .cal-day.has-record { border-color: var(--green); background: #0d2e1a; }
+  .cal-day.negative { border-color: var(--red); background: #2d1117; }
+  .cal-day.sunday-worked { border-color: var(--yellow); background: #2d2000; }
+
+  .cal-day .day-hours {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .cal-day.has-record .day-hours { color: var(--green); }
+  .cal-day.negative .day-hours { color: var(--red); }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  .badge {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge-green { background: #0d2e1a; color: var(--green); }
+  .badge-red { background: #2d1117; color: var(--red); }
+  .badge-yellow { background: #2d2000; color: var(--yellow); }
+
+  /* CLT rules */
+  .rule-block {
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  .rule-block.yellow-bg { background: #2d2000; border: 1px solid #5a3e00; }
+  .rule-block.red-bg { background: #2d1117; border: 1px solid #5a1520; }
+  .rule-block.green-bg { background: #0d2e1a; border: 1px solid #145230; }
+  .rule-block.blue-bg { background: #0d1f3c; border: 1px solid #1a3a6e; }
+
+  .rule-block h3 { font-size: 15px; margin-bottom: 10px; }
+  .rule-block ul { list-style: none; padding: 0; }
+  .rule-block li { padding: 4px 0; padding-left: 16px; position: relative; color: var(--muted); font-size: 13px; }
+  .rule-block li::before { content: '•'; position: absolute; left: 0; }
+
+  /* Configurações */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: border .15s;
+  }
+
+  .form-group input:focus { border-color: var(--purple); }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: opacity .15s;
+  }
+
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--purple); color: #fff; }
+  .btn-danger { background: #8b1a1a; color: #fca5a5; border: 1px solid #b91c1c; }
+
+  /* Modal */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+  }
+
+  .modal h3 { font-size: 18px; margin-bottom: 4px; }
+  .modal .modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+  .modal .form-group { margin-bottom: 14px; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  /* Consolidado rows */
+  .consol-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .consol-row:last-child { border-bottom: none; }
+
+  .consol-month { font-size: 14px; }
+  .consol-stats { display: flex; gap: 20px; font-size: 13px; color: var(--muted); }
+
+  /* Week summary */
+  .week-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .week-day-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .week-day-chip .wdc-day { font-weight: 600; margin-bottom: 2px; }
+  .week-day-chip .wdc-hours { font-size: 12px; color: var(--muted); }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 14px;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all .25s;
+    pointer-events: none;
+  }
+
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.success { border-color: var(--green); color: var(--green); }
+  #toast.error { border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span>⏱</span> Controle de Jornada</div>
+  <div class="date-display" id="headerDate"></div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="goTo('dashboard')">Dashboard</button>
+  <button class="nav-btn" onclick="goTo('registrar')">Registrar Ponto</button>
+  <button class="nav-btn" onclick="goTo('historico')">Histórico</button>
+  <button class="nav-btn" onclick="goTo('regras')">Regras CLT</button>
+  <button class="nav-btn" onclick="goTo('config')">Configurações</button>
+</nav>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="month-nav">
+      <button class="icon-btn" onclick="dashMonth(-1)">←</button>
+      <h2 id="dashMonthLabel"></h2>
+      <button class="icon-btn" onclick="dashMonth(1)">→</button>
+    </div>
+
+    <div class="cards" id="dashCards"></div>
+
+    <div class="box">
+      <div class="box-title">Consolidado Geral <span class="tag tag-purple">Todos os meses</span></div>
+      <div id="consolGeral"></div>
+    </div>
+
+    <div class="box">
+      <div class="box-title">Resumo da Semana Atual</div>
+      <div id="weekSummary"></div>
+    </div>
+  </div>
+
+  <!-- REGISTRAR PONTO -->
+  <div class="page" id="page-registrar">
+    <div class="cal-info" id="calInfo"></div>
+
+    <div class="month-nav">
+      <button class="icon-btn" onclick="calMonth(-1)">←</button>
+      <h2 id="calMonthLabel"></h2>
+      <button class="icon-btn" onclick="calMonth(1)">→</button>
+    </div>
+
+    <div class="box" style="padding:16px">
+      <div class="calendar" id="calendar"></div>
+    </div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div class="page" id="page-historico">
+    <div class="month-nav">
+      <button class="icon-btn" onclick="histMonth(-1)">←</button>
+      <h2 id="histMonthLabel"></h2>
+      <button class="icon-btn" onclick="histMonth(1)">→</button>
+    </div>
+
+    <div class="box">
+      <div class="box-title">Registros do Mês</div>
+      <div id="histTable"></div>
+    </div>
+  </div>
+
+  <!-- REGRAS CLT -->
+  <div class="page" id="page-regras">
+    <div class="box">
+      <div class="box-title">📋 Regras CLT – Domingo Trabalhado <span class="tag tag-yellow">6x1</span></div>
+
+      <div class="rule-block yellow-bg">
+        <h3 style="color:var(--yellow)">Art. 67 da CLT – Descanso Semanal Remunerado (DSR)</h3>
+        <ul>
+          <li>Todo trabalhador tem direito a <b style="color:var(--text)">1 dia de descanso por semana</b>, preferencialmente aos domingos.</li>
+          <li>Na escala 6x1, o domingo é o seu dia de folga oficial (DSR).</li>
+        </ul>
+      </div>
+
+      <div class="rule-block red-bg">
+        <h3 style="color:var(--red)">O que acontece se trabalhar no domingo?</h3>
+        <ul>
+          <li style="color:var(--red)"><b>Opção 1 – Compensação:</b><br><span style="color:var(--muted);padding-left:0">Folga em outro dia da semana seguinte. Deve ser acordado com o empregador.</span></li>
+          <li style="color:var(--red);margin-top:8px"><b>Opção 2 – Pagamento em dobro (Art. 9° da Lei 605/49):</b><br><span style="color:var(--muted)">O empregador deve pagar 100% a mais pelas horas no domingo (hora dupla).</span></li>
+          <li style="color:var(--red);margin-top:8px"><b>Opção 3 – Banco de Horas:</b><br><span style="color:var(--muted)">Horas do domingo como horas extras 100%, compensadas em até 1 ano (acordo coletivo) ou 6 meses (individual).</span></li>
+        </ul>
+      </div>
+
+      <div class="rule-block green-bg">
+        <h3 style="color:var(--green)">Horas Extras – Referência Geral (CLT Art. 59)</h3>
+        <ul>
+          <li>Máximo de <b style="color:var(--text)">2h extras por dia</b> permitidas por lei.</li>
+          <li>Horas extras em dias normais: <b style="color:var(--green)">+50% sobre o valor da hora normal.</b></li>
+          <li>Horas extras em domingos/feriados: <b style="color:var(--green)">+100% sobre o valor da hora normal.</b></li>
+          <li>Banco de horas pode substituir pagamento se houver acordo escrito.</li>
+        </ul>
+      </div>
+
+      <div class="rule-block blue-bg">
+        <h3 style="color:var(--blue)">⚠ Atenção – Escala 6x1 (Art. 59-A CLT)</h3>
+        <ul>
+          <li>A escala 6x1 com jornada reduzida (ex: 36h semanais) foi regulamentada.</li>
+          <li>Se a sua escala Seg–Sex (8h) + Sáb (4h) = <b style="color:var(--yellow)">44h semanais</b>, está dentro do limite legal.</li>
+          <li>Qualquer hora acima de 44h semanais é hora extra e deve ser paga ou compensada.</li>
+        </ul>
+      </div>
+
+      <div class="box-title" style="margin-top:8px">Domingos Registrados</div>
+      <div id="domingosList"></div>
+    </div>
+  </div>
+
+  <!-- CONFIGURAÇÕES -->
+  <div class="page" id="page-config">
+    <div class="box">
+      <div class="box-title">⚙ Configurações da Escala</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Entrada Seg–Sex</label>
+          <input type="time" id="cfgEntradaSF" value="14:00">
+        </div>
+        <div class="form-group">
+          <label>Saída Seg–Sex</label>
+          <input type="time" id="cfgSaidaSF" value="22:00">
+        </div>
+        <div class="form-group">
+          <label>Intervalo Seg–Sex (min)</label>
+          <input type="number" id="cfgIntervalSF" value="60" min="0">
+        </div>
+        <div class="form-group">
+          <label>Entrada Sábado</label>
+          <input type="time" id="cfgEntradaSab" value="09:00">
+        </div>
+        <div class="form-group">
+          <label>Saída Sábado</label>
+          <input type="time" id="cfgSaidaSab" value="13:00">
+        </div>
+        <div class="form-group">
+          <label>Intervalo Sábado (min)</label>
+          <input type="number" id="cfgIntervalSab" value="0" min="0">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveConfig()">Salvar Configurações</button>
+    </div>
+
+    <div class="box">
+      <div class="box-title">🗑 Dados</div>
+      <button class="btn btn-danger" onclick="confirmClear()">Apagar todos os registros</button>
+      <p style="color:var(--muted);font-size:12px;margin-top:10px">Esta ação é irreversível. Seus dados ficam salvos apenas neste navegador.</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- Modal: Registrar dia -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <h3 id="modalTitle"></h3>
+    <p class="modal-sub" id="modalSub"></p>
+
+    <div class="form-group">
+      <label>Entrada</label>
+      <input type="time" id="mEntrada">
+    </div>
+    <div class="form-group">
+      <label>Saída</label>
+      <input type="time" id="mSaida">
+    </div>
+    <div class="form-group">
+      <label>Intervalo (min)</label>
+      <input type="number" id="mIntervalo" value="60" min="0">
+    </div>
+    <div class="form-group">
+      <label>Observação</label>
+      <input type="text" id="mObs" placeholder="Opcional...">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="btnExcluir" onclick="excluirRegistro()" style="display:none">Excluir</button>
+      <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarRegistro()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ─── State ──────────────────────────────────────────────
+const STORAGE_KEY = 'jornada_v1';
+const CONFIG_KEY  = 'jornada_cfg_v1';
+
+let state = {
+  records: {},   // "YYYY-MM-DD": { entrada, saida, intervalo, obs }
+  dashYear: new Date().getFullYear(),
+  dashMonth: new Date().getMonth(),
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+  histYear: new Date().getFullYear(),
+  histMonth: new Date().getMonth(),
+};
+
+let cfg = {
+  entradaSF: '14:00', saidaSF: '22:00', intervalSF: 60,
+  entradaSab: '09:00', saidaSab: '13:00', intervalSab: 0,
+};
+
+let modalDate = null;
+
+function load() {
+  try { const d = JSON.parse(localStorage.getItem(STORAGE_KEY)); if (d) state.records = d; } catch(e){}
+  try { const c = JSON.parse(localStorage.getItem(CONFIG_KEY)); if (c) cfg = {...cfg, ...c}; } catch(e){}
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+}
+
+// ─── Utils ──────────────────────────────────────────────
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function dateKey(y, m, d) { return `${y}-${pad(m+1)}-${pad(d)}`; }
+
+function parseTime(t) {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function formatMins(m) {
+  const neg = m < 0;
+  const abs = Math.abs(m);
+  const h = Math.floor(abs / 60);
+  const min = abs % 60;
+  return (neg ? '-' : '+') + h + 'h' + (min ? pad(min) + 'm' : '');
+}
+
+function workedMins(rec) {
+  if (!rec || !rec.entrada || !rec.saida) return 0;
+  const w = parseTime(rec.saida) - parseTime(rec.entrada) - (rec.intervalo || 0);
+  return Math.max(0, w);
+}
+
+function expectedMins(dateStr) {
+  const dow = new Date(dateStr + 'T00:00:00').getDay(); // 0=Sun
+  if (dow === 0) return 0;  // Domingo = folga
+  if (dow === 6) return (parseTime(cfg.saidaSab) - parseTime(cfg.entradaSab) - cfg.intervalSab);
+  return (parseTime(cfg.saidaSF) - parseTime(cfg.entradaSF) - cfg.intervalSF);
+}
+
+function isSunday(y, m, d) { return new Date(y, m, d).getDay() === 0; }
+function isSaturday(y, m, d) { return new Date(y, m, d).getDay() === 6; }
+
+const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                     'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DAY_NAMES = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+
+function fmtMonthYear(y, m) { return MONTH_NAMES[m] + ' ' + y; }
+
+function today() {
+  const d = new Date();
+  return { y: d.getFullYear(), m: d.getMonth(), d: d.getDate() };
+}
+
+// ─── Navigation ─────────────────────────────────────────
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.currentTarget.classList.add('active');
+  render(page);
+}
+
+function dashMonth(dir) { state.dashMonth += dir; if (state.dashMonth < 0) { state.dashMonth=11; state.dashYear--; } if (state.dashMonth > 11) { state.dashMonth=0; state.dashYear++; } renderDashboard(); }
+function calMonth(dir)  { state.calMonth += dir;  if (state.calMonth < 0)  { state.calMonth=11;  state.calYear--;  } if (state.calMonth > 11)  { state.calMonth=0;  state.calYear++;  } renderCalendar(); }
+function histMonth(dir) { state.histMonth += dir; if (state.histMonth < 0) { state.histMonth=11; state.histYear--; } if (state.histMonth > 11) { state.histMonth=0; state.histYear++; } renderHistorico(); }
+
+function render(page) {
+  if (page === 'dashboard') renderDashboard();
+  else if (page === 'registrar') renderCalendar();
+  else if (page === 'historico') renderHistorico();
+  else if (page === 'regras') renderRegras();
+  else if (page === 'config') renderConfig();
+}
+
+// ─── Dashboard ──────────────────────────────────────────
+function renderDashboard() {
+  const y = state.dashYear, m = state.dashMonth;
+  document.getElementById('dashMonthLabel').textContent = fmtMonthYear(y, m);
+
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  let totalWorked = 0, totalExpected = 0, positivo = 0, negativo = 0;
+  let diasTrabalhados = 0, domingosTrabalhados = 0;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = dateKey(y, m, d);
+    const rec = state.records[key];
+    const exp = expectedMins(key);
+    if (rec) {
+      const w = workedMins(rec);
+      totalWorked += w;
+      diasTrabalhados++;
+      if (isSunday(y, m, d)) domingosTrabalhados++;
+    }
+    if (!isSunday(y, m, d) && new Date(y, m, d) <= new Date()) {
+      totalExpected += exp;
+    }
+  }
+
+  const saldo = totalWorked - totalExpected;
+  positivo = Math.max(0, saldo);
+  negativo = Math.min(0, saldo);
+
+  const cards = document.getElementById('dashCards');
+  cards.innerHTML = `
+    <div class="card">
+      <div class="card-label">Saldo do Mês</div>
+      <div class="card-value ${saldo >= 0 ? 'green' : 'red'}">${formatMins(saldo)}</div>
+      <div class="card-sub">${saldo === 0 ? 'Zerado' : saldo > 0 ? 'Superávit' : 'Déficit'}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Total Trabalhado</div>
+      <div class="card-value blue">${formatMins(totalWorked).replace('+','')}</div>
+      <div class="card-sub">de ${formatMins(totalExpected).replace('+','')} esperados</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Horas Positivas</div>
+      <div class="card-value green">${formatMins(positivo)}</div>
+      <div class="card-sub">Excedentes registrados</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Horas Negativas</div>
+      <div class="card-value red">${formatMins(negativo)}</div>
+      <div class="card-sub">Déficit acumulado</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Dias Trabalhados</div>
+      <div class="card-value blue">${diasTrabalhados}</div>
+      <div class="card-sub">registros no mês</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Domingos Trabalhados</div>
+      <div class="card-value yellow">${domingosTrabalhados}</div>
+      <div class="card-sub">${domingosTrabalhados === 0 ? 'Nenhum' : domingosTrabalhados === 1 ? '1 domingo' : domingosTrabalhados + ' domingos'}</div>
+    </div>
+  `;
+
+  // Consolidado geral
+  const consolEl = document.getElementById('consolGeral');
+  const allKeys = Object.keys(state.records).sort();
+  if (!allKeys.length) { consolEl.innerHTML = '<div class="empty">Nenhum registro ainda.</div>'; }
+  else {
+    const monthMap = {};
+    allKeys.forEach(k => {
+      const [ky, km] = k.split('-');
+      const mk = ky + '-' + km;
+      if (!monthMap[mk]) monthMap[mk] = { y: +ky, m: +km-1, worked: 0, days: 0 };
+      monthMap[mk].worked += workedMins(state.records[k]);
+      monthMap[mk].days++;
+    });
+    consolEl.innerHTML = Object.entries(monthMap).reverse().map(([mk, v]) => {
+      return `<div class="consol-row">
+        <span class="consol-month">${fmtMonthYear(v.y, v.m)}</span>
+        <span class="consol-stats">
+          <span>${v.days} dias</span>
+          <span class="blue">${formatMins(v.worked).replace('+','')} trabalhadas</span>
+        </span>
+      </div>`;
+    }).join('');
+  }
+
+  // Semana atual
+  const weekEl = document.getElementById('weekSummary');
+  const todayD = new Date();
+  const dayOfWeek = todayD.getDay(); // 0=Sun
+  const startOfWeek = new Date(todayD);
+  startOfWeek.setDate(todayD.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+
+  let weekHtml = '<div class="week-row">';
+  let hasWeekData = false;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    const k = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    const rec = state.records[k];
+    const dn = DAY_NAMES[d.getDay()];
+    const w = rec ? workedMins(rec) : null;
+    if (rec) hasWeekData = true;
+    weekHtml += `<div class="week-day-chip ${rec ? 'has-record' : ''}">
+      <div class="wdc-day">${dn} ${d.getDate()}</div>
+      <div class="wdc-hours">${w !== null ? formatMins(w).replace('+','') : '—'}</div>
+    </div>`;
+  }
+  weekHtml += '</div>';
+  weekEl.innerHTML = hasWeekData ? weekHtml : '<div class="empty">Nenhum registro esta semana.</div>';
+}
+
+// ─── Calendar ───────────────────────────────────────────
+function renderCalendar() {
+  const y = state.calYear, m = state.calMonth;
+  document.getElementById('calMonthLabel').textContent = fmtMonthYear(y, m);
+
+  // Info chips
+  const info = document.getElementById('calInfo');
+  info.innerHTML = `
+    <div class="schedule-chip">Seg–Sex: <b>${cfg.entradaSF} – ${cfg.saidaSF}</b> (${((parseTime(cfg.saidaSF)-parseTime(cfg.entradaSF)-cfg.intervalSF)/60).toFixed(0)}h)</div>
+    <div class="schedule-chip">Sábado: <b>${cfg.entradaSab} – ${cfg.saidaSab}</b> (${((parseTime(cfg.saidaSab)-parseTime(cfg.entradaSab)-cfg.intervalSab)/60).toFixed(0)}h)</div>
+    <div class="schedule-chip">Domingo: <b style="color:var(--purple-light)">Folga (6x1)</b></div>
+    <div class="cal-legend"><span class="dot" style="background:var(--green)"></span> Com registro</div>
+    <div class="cal-legend"><span class="dot" style="background:var(--red)"></span> Negativo</div>
+    <div class="cal-legend"><span class="dot" style="background:var(--yellow)"></span> Domingo trab.</div>
+  `;
+
+  const cal = document.getElementById('calendar');
+  cal.innerHTML = '';
+
+  // Headers
+  ['SEG','TER','QUA','QUI','SEX','SÁB','DOM'].forEach(d => {
+    cal.innerHTML += `<div class="cal-header">${d}</div>`;
+  });
+
+  const firstDay = new Date(y, m, 1).getDay(); // 0=Sun
+  // Convert to Mon=0
+  const offset = (firstDay === 0) ? 6 : firstDay - 1;
+
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const t = today();
+
+  // Empty cells
+  for (let i = 0; i < offset; i++) {
+    cal.innerHTML += '<div class="cal-day disabled"></div>';
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = dateKey(y, m, d);
+    const rec = state.records[key];
+    const dow = new Date(y, m, d).getDay();
+    const isSun = dow === 0;
+    const w = rec ? workedMins(rec) : 0;
+    const exp = expectedMins(key);
+    const saldo = w - exp;
+
+    let cls = 'cal-day';
+    if (y === t.y && m === t.m && d === t.d) cls += ' today';
+    if (isSun) cls += ' sunday';
+    if (rec) {
+      if (isSun) cls += ' sunday-worked';
+      else if (saldo < 0) cls += ' negative';
+      else cls += ' has-record';
+    }
+
+    const hoursLabel = rec ? `<div class="day-hours">${formatMins(w).replace('+','')}${!isSun ? ' / '+formatMins(exp).replace('+','') : ''}</div>` : '';
+
+    cal.innerHTML += `<div class="${cls}" onclick="openModal('${key}')">${d}${hoursLabel}</div>`;
+  }
+}
+
+// ─── Modal ──────────────────────────────────────────────
+function openModal(dateStr) {
+  modalDate = dateStr;
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const dow = new Date(y, mo-1, d).getDay();
+  const dayName = DAY_NAMES[dow];
+  const isSun = dow === 0;
+  const isSat = dow === 6;
+
+  document.getElementById('modalTitle').textContent = `${dayName}, ${d} de ${MONTH_NAMES[mo-1]} de ${y}`;
+  document.getElementById('modalSub').textContent = isSun ? 'Domingo – dia de folga (6x1). Registrar mesmo assim?' : `Escala: ${isSat ? cfg.entradaSab+' – '+cfg.saidaSab : cfg.entradaSF+' – '+cfg.saidaSF}`;
+
+  const rec = state.records[dateStr];
+  document.getElementById('mEntrada').value = rec ? rec.entrada : (isSat ? cfg.entradaSab : isSun ? '' : cfg.entradaSF);
+  document.getElementById('mSaida').value = rec ? rec.saida : (isSat ? cfg.saidaSab : isSun ? '' : cfg.saidaSF);
+  document.getElementById('mIntervalo').value = rec ? rec.intervalo : (isSat ? cfg.intervalSab : isSun ? 0 : cfg.intervalSF);
+  document.getElementById('mObs').value = rec ? (rec.obs || '') : '';
+  document.getElementById('btnExcluir').style.display = rec ? '' : 'none';
+
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('overlay')) return;
+  document.getElementById('overlay').classList.remove('open');
+  modalDate = null;
+}
+
+function salvarRegistro() {
+  const entrada = document.getElementById('mEntrada').value;
+  const saida = document.getElementById('mSaida').value;
+  if (!entrada || !saida) { showToast('Preencha entrada e saída.', 'error'); return; }
+  if (parseTime(saida) <= parseTime(entrada)) { showToast('Saída deve ser após a entrada.', 'error'); return; }
+
+  state.records[modalDate] = {
+    entrada,
+    saida,
+    intervalo: parseInt(document.getElementById('mIntervalo').value) || 0,
+    obs: document.getElementById('mObs').value.trim(),
+  };
+  save();
+  closeModal();
+  renderCalendar();
+  showToast('Registro salvo!', 'success');
+}
+
+function excluirRegistro() {
+  if (!confirm('Excluir registro deste dia?')) return;
+  delete state.records[modalDate];
+  save();
+  closeModal();
+  renderCalendar();
+  showToast('Registro excluído.', 'success');
+}
+
+// ─── Histórico ──────────────────────────────────────────
+function renderHistorico() {
+  const y = state.histYear, m = state.histMonth;
+  document.getElementById('histMonthLabel').textContent = fmtMonthYear(y, m);
+
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const rows = [];
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = dateKey(y, m, d);
+    const rec = state.records[key];
+    if (!rec) continue;
+    const dow = new Date(y, m, d).getDay();
+    const w = workedMins(rec);
+    const exp = expectedMins(key);
+    const saldo = w - exp;
+    const isSun = dow === 0;
+
+    rows.push({ key, d, dow, rec, w, exp, saldo, isSun });
+  }
+
+  const el = document.getElementById('histTable');
+  if (!rows.length) { el.innerHTML = `<table><thead><tr><th>DATA</th><th>DIA</th><th>ENTRADA</th><th>SAÍDA</th><th>INTERVALO</th><th>TRABALHADO</th><th>ESPERADO</th><th>SALDO</th><th>OBS</th></tr></thead></table><div class="empty">Nenhum registro para este mês.</div>`; return; }
+
+  el.innerHTML = `<table>
+    <thead><tr><th>DATA</th><th>DIA</th><th>ENTRADA</th><th>SAÍDA</th><th>INTERVALO</th><th>TRABALHADO</th><th>ESPERADO</th><th>SALDO</th><th>OBS</th></tr></thead>
+    <tbody>
+    ${rows.map(r => `<tr>
+      <td>${pad(r.d)}/${pad(m+1)}/${y}</td>
+      <td>${DAY_NAMES[r.dow]}</td>
+      <td>${r.rec.entrada}</td>
+      <td>${r.rec.saida}</td>
+      <td>${r.rec.intervalo}min</td>
+      <td>${formatMins(r.w).replace('+','')}</td>
+      <td>${r.isSun ? 'Folga' : formatMins(r.exp).replace('+','')}</td>
+      <td><span class="badge ${r.saldo >= 0 ? 'badge-green' : 'badge-red'}">${formatMins(r.saldo)}</span></td>
+      <td style="color:var(--muted)">${r.rec.obs || '—'}</td>
+    </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ─── Regras ─────────────────────────────────────────────
+function renderRegras() {
+  const domingos = Object.entries(state.records).filter(([k]) => {
+    const [y, m, d] = k.split('-').map(Number);
+    return new Date(y, m-1, d).getDay() === 0;
+  });
+
+  const el = document.getElementById('domingosList');
+  if (!domingos.length) { el.innerHTML = '<div class="empty">Nenhum domingo trabalhado registrado.</div>'; return; }
+
+  el.innerHTML = `<table>
+    <thead><tr><th>DATA</th><th>ENTRADA</th><th>SAÍDA</th><th>TRABALHADO</th><th>OBS</th></tr></thead>
+    <tbody>
+    ${domingos.sort().map(([k, rec]) => {
+      const [y, m, d] = k.split('-').map(Number);
+      const w = workedMins(rec);
+      return `<tr>
+        <td>${pad(d)}/${m}/${y}</td>
+        <td>${rec.entrada}</td>
+        <td>${rec.saida}</td>
+        <td class="yellow">${formatMins(w).replace('+','')}</td>
+        <td style="color:var(--muted)">${rec.obs || '—'}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ─── Config ─────────────────────────────────────────────
+function renderConfig() {
+  document.getElementById('cfgEntradaSF').value = cfg.entradaSF;
+  document.getElementById('cfgSaidaSF').value = cfg.saidaSF;
+  document.getElementById('cfgIntervalSF').value = cfg.intervalSF;
+  document.getElementById('cfgEntradaSab').value = cfg.entradaSab;
+  document.getElementById('cfgSaidaSab').value = cfg.saidaSab;
+  document.getElementById('cfgIntervalSab').value = cfg.intervalSab;
+}
+
+function saveConfig() {
+  cfg.entradaSF = document.getElementById('cfgEntradaSF').value;
+  cfg.saidaSF   = document.getElementById('cfgSaidaSF').value;
+  cfg.intervalSF = parseInt(document.getElementById('cfgIntervalSF').value) || 0;
+  cfg.entradaSab = document.getElementById('cfgEntradaSab').value;
+  cfg.saidaSab   = document.getElementById('cfgSaidaSab').value;
+  cfg.intervalSab = parseInt(document.getElementById('cfgIntervalSab').value) || 0;
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+  showToast('Configurações salvas!', 'success');
+}
+
+function confirmClear() {
+  if (!confirm('Apagar TODOS os registros? Esta ação é irreversível.')) return;
+  state.records = {};
+  save();
+  showToast('Todos os registros foram apagados.', 'success');
+}
+
+// ─── Toast ──────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + (type || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 2500);
+}
+
+// ─── Header date ────────────────────────────────────────
+function updateHeaderDate() {
+  const d = new Date();
+  const days = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  document.getElementById('headerDate').textContent =
+    days[d.getDay()] + ', ' + pad(d.getDate()) + ' de ' + MONTH_NAMES[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+// ─── Init ───────────────────────────────────────────────
+load();
+updateHeaderDate();
+renderDashboard();
+</script>
+</body>
+</html>
