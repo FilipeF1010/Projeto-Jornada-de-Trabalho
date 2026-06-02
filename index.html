@@ -293,7 +293,8 @@
   .modal-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
   .modal-tab { padding: 7px 16px; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: 13px; transition: all .15s; }
   .modal-tab.active { background: var(--purple); border-color: var(--purple); color: #fff; }
-  .modal-tab.tab-ferias.active { background: var(--orange); border-color: var(--orange); }
+  .modal-tab.tab-ferias.active  { background: var(--orange); border-color: var(--orange); }
+  .modal-tab.tab-feriado.active { background: var(--teal);   border-color: var(--teal); color: #000; }
 
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
@@ -545,14 +546,15 @@
 
     <div class="modal-tabs" id="modalTabs">
       <button class="modal-tab active" onclick="switchTab('ponto')">📋 Ponto</button>
-      <button class="modal-tab tab-ferias" onclick="switchTab('ferias')">🏖 Marcar Férias</button>
+      <button class="modal-tab tab-ferias" onclick="switchTab('ferias')">🏖 Férias</button>
+      <button class="modal-tab tab-feriado" onclick="switchTab('feriado')">🎉 Feriado</button>
     </div>
 
     <!-- Ponto -->
     <div class="tab-panel active" id="tabPonto">
       <div class="form-group"><label>Entrada</label><input type="time" id="mEntrada"></div>
       <div class="form-group"><label>Saída</label><input type="time" id="mSaida"></div>
-      <div class="form-group"><label>Intervalo (min)</label><input type="number" id="mIntervalo" value="60" min="0"></div>
+      <div class="form-group"><label>Intervalo (min)</label><input type="number" id="mIntervalo" value="0" min="0"></div>
       <div class="form-group"><label>Observação</label><input type="text" id="mObs" placeholder="Opcional..."></div>
     </div>
 
@@ -563,9 +565,17 @@
       <div id="feriasDayStatus" style="margin-top:8px;font-size:13px;color:var(--muted)"></div>
     </div>
 
+    <!-- Feriado -->
+    <div class="tab-panel" id="tabFeriado">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Marque este dia como <b style="color:var(--teal)">feriado</b>. Feriados não geram débito de horas.</p>
+      <div class="form-group"><label>Nome do Feriado</label><input type="text" id="mFeriadoNome" placeholder="Ex: Feriado Municipal, Ponto Facultativo..."></div>
+      <div id="feriadoDayStatus" style="margin-top:8px;font-size:13px;color:var(--muted)"></div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn btn-danger" id="btnExcluir" onclick="excluirRegistro()" style="display:none">Excluir Ponto</button>
       <button class="btn btn-danger" id="btnExcluirFerias" onclick="excluirFerias()" style="display:none">Remover Férias</button>
+      <button class="btn btn-danger" id="btnExcluirFeriado" onclick="excluirFeriadoCustom()" style="display:none">Remover Feriado</button>
       <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-primary" id="btnSalvar" onclick="salvarRegistro()">Salvar</button>
     </div>
@@ -613,18 +623,25 @@ function getHolidays(y){
   return h;
 }
 
-function isHoliday(dateStr){ return getHolidays(parseInt(dateStr.split('-')[0]))[dateStr]||null; }
+function isHoliday(dateStr){
+  return state.feriadosCustom[dateStr]
+      || getHolidays(parseInt(dateStr.split('-')[0]))[dateStr]
+      || null;
+}
+function isCustomHoliday(dateStr){ return state.feriadosCustom[dateStr]||null; }
 
 // ═══════════════════════════════════════════════════════
 // ESTADO
 // ═══════════════════════════════════════════════════════
 const STORAGE_KEY  = 'jornada_v1';
 const CONFIG_KEY   = 'jornada_cfg_v1';
-const FERIAS_KEY   = 'jornada_ferias_v1';
+const FERIAS_KEY    = 'jornada_ferias_v1';
+const FERIADOS_KEY  = 'jornada_feriados_custom_v1';
 
 let state = {
   records:   {},
-  ferias:    [], // [ { inicio, fim, obs, dias:[] } ]
+  ferias:         [], // [ { inicio, fim, obs, dias:[] } ]
+  feriadosCustom: {}, // { "YYYY-MM-DD": "Nome do feriado" }
   dashYear:  new Date().getFullYear(),
   dashMonth: new Date().getMonth(),
   calYear:   new Date().getFullYear(),
@@ -648,12 +665,14 @@ let activeTab = 'ponto';
 function load(){
   try{ const d=JSON.parse(localStorage.getItem(STORAGE_KEY)); if(d) state.records=d; }catch(e){}
   try{ const c=JSON.parse(localStorage.getItem(CONFIG_KEY));  if(c) cfg={...cfg,...c}; }catch(e){}
-  try{ const f=JSON.parse(localStorage.getItem(FERIAS_KEY));  if(f) state.ferias=f; }catch(e){}
+  try{ const f=JSON.parse(localStorage.getItem(FERIAS_KEY));   if(f) state.ferias=f; }catch(e){}
+  try{ const h=JSON.parse(localStorage.getItem(FERIADOS_KEY)); if(h) state.feriadosCustom=h; }catch(e){}
 }
 
 function save(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
-  localStorage.setItem(FERIAS_KEY,  JSON.stringify(state.ferias));
+  localStorage.setItem(STORAGE_KEY,   JSON.stringify(state.records));
+  localStorage.setItem(FERIAS_KEY,    JSON.stringify(state.ferias));
+  localStorage.setItem(FERIADOS_KEY,  JSON.stringify(state.feriadosCustom));
 }
 
 // ═══════════════════════════════════════════════════════
@@ -773,6 +792,25 @@ function excluirFerias(){
   showToast('Dia de férias removido.','success');
 }
 
+function salvarFeriadoCustom(){
+  const nome = document.getElementById('mFeriadoNome').value.trim();
+  if(!nome){ showToast('Digite o nome do feriado.','error'); return; }
+  state.feriadosCustom[modalDate] = nome;
+  save();
+  closeModal();
+  renderCalendar();
+  showToast('Feriado marcado: '+nome,'success');
+}
+
+function excluirFeriadoCustom(){
+  if(!confirm('Remover este feriado?')) return;
+  delete state.feriadosCustom[modalDate];
+  save();
+  closeModal();
+  renderCalendar();
+  showToast('Feriado removido.','success');
+}
+
 // ═══════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════
@@ -848,19 +886,31 @@ function switchTab(tab){
   document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
   event.currentTarget.classList.add('active');
 
-  const isFeriasTab = (tab === 'ferias');
-  document.getElementById('btnSalvar').textContent    = isFeriasTab ? '🏖 Salvar Férias' : 'Salvar';
-  document.getElementById('btnSalvar').className      = isFeriasTab ? 'btn btn-orange' : 'btn btn-primary';
-  document.getElementById('btnExcluir').style.display       = (!isFeriasTab && state.records[modalDate]) ? '' : 'none';
-  document.getElementById('btnExcluirFerias').style.display = (isFeriasTab && isFeriasDay(modalDate)) ? '' : 'none';
+  const isFeriasTab  = (tab === 'ferias');
+  const isFeriadoTab = (tab === 'feriado');
+  const isPontoTab   = (tab === 'ponto');
+
+  // Botão salvar
+  if(isFeriasTab)       { document.getElementById('btnSalvar').textContent='🏖 Salvar Férias';  document.getElementById('btnSalvar').className='btn btn-orange'; }
+  else if(isFeriadoTab) { document.getElementById('btnSalvar').textContent='🎉 Salvar Feriado'; document.getElementById('btnSalvar').className='btn btn-primary'; document.getElementById('btnSalvar').style.background='var(--teal)'; document.getElementById('btnSalvar').style.color='#000'; }
+  else                  { document.getElementById('btnSalvar').textContent='Salvar';            document.getElementById('btnSalvar').className='btn btn-primary'; document.getElementById('btnSalvar').style.background=''; document.getElementById('btnSalvar').style.color=''; }
+
+  // Botões excluir
+  document.getElementById('btnExcluir').style.display         = (isPontoTab  && state.records[modalDate])          ? '' : 'none';
+  document.getElementById('btnExcluirFerias').style.display   = (isFeriasTab  && isFeriasDay(modalDate))           ? '' : 'none';
+  document.getElementById('btnExcluirFeriado').style.display  = (isFeriadoTab && isCustomHoliday(modalDate))       ? '' : 'none';
 
   if(isFeriasTab){
     const isFer = isFeriasDay(modalDate);
-    document.getElementById('feriasDayStatus').textContent = isFer
-      ? '✅ Este dia já está marcado como férias.'
-      : '';
+    document.getElementById('feriasDayStatus').textContent = isFer ? '✅ Este dia já está marcado como férias.' : '';
     const p = isFer ? state.ferias.find(p=>p.dias.includes(modalDate)) : null;
     document.getElementById('mFeriasObs').value = p ? p.obs : '';
+  }
+
+  if(isFeriadoTab){
+    const nome = isCustomHoliday(modalDate);
+    document.getElementById('feriadoDayStatus').textContent = nome ? '✅ Feriado: '+nome : '';
+    document.getElementById('mFeriadoNome').value = nome || '';
   }
 }
 
@@ -1138,10 +1188,17 @@ function openModal(dateStr){
   document.getElementById('mFeriasObs').value=ferP?ferP.obs:'';
   document.getElementById('feriasDayStatus').textContent=fer?'✅ Este dia já está marcado como férias.':'';
 
-  document.getElementById('btnExcluir').style.display      =rec?'':'none';
-  document.getElementById('btnExcluirFerias').style.display=fer?'':'none';
+  const feriadoCustom=isCustomHoliday(dateStr);
+  document.getElementById('mFeriadoNome').value=feriadoCustom||'';
+  document.getElementById('feriadoDayStatus').textContent=feriadoCustom?'✅ Feriado: '+feriadoCustom:'';
+
+  document.getElementById('btnExcluir').style.display         =rec?'':'none';
+  document.getElementById('btnExcluirFerias').style.display   =fer?'':'none';
+  document.getElementById('btnExcluirFeriado').style.display  =feriadoCustom?'':'none';
   document.getElementById('btnSalvar').textContent='Salvar';
   document.getElementById('btnSalvar').className='btn btn-primary';
+  document.getElementById('btnSalvar').style.background='';
+  document.getElementById('btnSalvar').style.color='';
 
   // Reset tab para ponto
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -1159,7 +1216,8 @@ function closeModal(e){
 }
 
 function salvarRegistro(){
-  if(activeTab==='ferias'){ salvarFeriasDia(); return; }
+  if(activeTab==='ferias')  { salvarFeriasDia();   return; }
+  if(activeTab==='feriado') { salvarFeriadoCustom(); return; }
   const entrada=document.getElementById('mEntrada').value;
   const saida  =document.getElementById('mSaida').value;
   if(!entrada||!saida){ showToast('Preencha entrada e saída.','error'); return; }
@@ -1397,6 +1455,7 @@ function confirmClear(){
   if(!confirm('Apagar TODOS os registros e férias? Esta ação é irreversível.')) return;
   state.records={};
   state.ferias=[];
+  state.feriadosCustom={};
   save();
   showToast('Todos os dados foram apagados.','success');
 }
