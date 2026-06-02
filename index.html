@@ -523,6 +523,14 @@
       <button class="btn btn-danger" onclick="confirmClear()">Apagar todos os registros e férias</button>
       <p style="color:var(--muted);font-size:12px;margin-top:10px">Esta ação é irreversível. Seus dados ficam salvos apenas neste navegador.</p>
     </div>
+
+    <div class="box">
+      <div class="box-title">🧪 Dados de Teste</div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:14px">Preenche automaticamente <b style="color:var(--text)">Abril/2025 → Janeiro/2026</b> com horários aleatórios:<br>
+        Seg–Sex: entrada 13:45–13:56 / saída 22:00 &nbsp;|&nbsp; Sábado: entrada 08:30–08:55 / saída 13:00
+      </p>
+      <button class="btn btn-primary" onclick="popularDadosTeste()">▶ Preencher Dados de Teste</button>
+    </div>
   </div>
 
 </main>
@@ -1391,6 +1399,41 @@ function confirmClear(){
   state.ferias=[];
   save();
   showToast('Todos os dados foram apagados.','success');
+}
+
+function popularDadosTeste(){
+  if(!confirm('Preencher Abril/2025 → Janeiro/2026 com horários aleatórios?\n\nSeg–Sex: 13:45–13:56 → 22:00\nSábado: 08:30–08:55 → 13:00\n\nRegistros existentes nesse período serão substituídos.')) return;
+
+  function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+  const periodos=[
+    {y:2025, meses:[3,4,5,6,7,8,9,10,11]}, // Abr–Dez 2025
+    {y:2026, meses:[0]},                    // Jan 2026
+  ];
+
+  let total=0;
+  periodos.forEach(({y,meses})=>{
+    meses.forEach(m=>{
+      const diasNoMes=new Date(y,m+1,0).getDate();
+      for(let d=1;d<=diasNoMes;d++){
+        const dow=new Date(y,m,d).getDay();
+        if(dow===0) continue; // pula domingo
+        const key=`${y}-${pad(m+1)}-${pad(d)}`;
+        if(dow===6){
+          // Sábado
+          state.records[key]={entrada:`08:${pad(randInt(30,55))}`,saida:'13:00',intervalo:0,obs:''};
+        } else {
+          // Seg–Sex
+          state.records[key]={entrada:`13:${pad(randInt(45,56))}`,saida:'22:00',intervalo:60,obs:''};
+        }
+        total++;
+      }
+    });
+  });
+
+  save();
+  renderDashboard();
+  showToast(`✅ ${total} dias preenchidos com sucesso!`,'success');
 }
 
 // ═══════════════════════════════════════════════════════
