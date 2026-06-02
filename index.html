@@ -966,11 +966,6 @@ function renderDashboard(){
       <div class="card-sub">${saldo===0?'Zerado':saldo>0?'Superávit':'Déficit'}</div>
     </div>
     <div class="card">
-      <div class="card-label">Total Trabalhado</div>
-      <div class="card-value blue">${formatMins(totalWorked).replace('+','')}</div>
-      <div class="card-sub">de ${formatMins(totalExpected).replace('+','')} esperados</div>
-    </div>
-    <div class="card">
       <div class="card-label">Horas Positivas</div>
       <div class="card-value green">${formatMins(Math.max(0,saldo))}</div>
       <div class="card-sub">Excedentes registrados</div>
@@ -1042,7 +1037,6 @@ function renderDashboard(){
         <span class="consol-stats">
           <span>${v.days} dias trabalhados</span>
           ${v.feriasDias?`<span class="orange">🏖 ${v.feriasDias} férias</span>`:''}
-          <span class="blue">${formatMins(v.worked).replace('+','')} trabalhadas</span>
           <span class="${s>=0?'green':'red'}">${formatMins(s)} saldo</span>
         </span>
       </div>`;
