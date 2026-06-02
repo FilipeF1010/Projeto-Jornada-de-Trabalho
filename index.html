@@ -917,10 +917,17 @@ function switchTab(tab){
 // ═══════════════════════════════════════════════════════
 // ACUMULADO
 // ═══════════════════════════════════════════════════════
+// Retorna horas trabalhadas desconsiderando dias de férias e feriados (neutros no saldo)
+function effectiveWorked(key, rec){
+  if(isFeriasDay(key)) return 0;
+  if(isHoliday(key))   return 0;
+  return workedMins(rec);
+}
+
 function calcAcumulado(){
   let totalW=0, totalE=0;
   Object.entries(state.records).forEach(([k,rec])=>{
-    totalW+=workedMins(rec);
+    totalW+=effectiveWorked(k,rec);
     totalE+=expectedMins(k);
   });
   return totalW-totalE;
@@ -941,7 +948,7 @@ function renderDashboard(){
     const rec=state.records[key];
     if(isFeriasDay(key)) feriasNoMes++;
     if(rec){
-      totalWorked+=workedMins(rec);
+      totalWorked+=effectiveWorked(key,rec);
       totalExpected+=expectedMins(key);
       diasTrabalhados++;
       if(isSunday(y,m,d)) domingosTrabalhados++;
@@ -1023,7 +1030,7 @@ function renderDashboard(){
       const [ky,km]=k.split('-');
       const mk=ky+'-'+km;
       if(!monthMap[mk]) monthMap[mk]={y:+ky,m:+km-1,worked:0,expected:0,days:0,feriasDias:0};
-      monthMap[mk].worked+=workedMins(state.records[k]);
+      monthMap[mk].worked+=effectiveWorked(k, state.records[k]);
       monthMap[mk].expected+=expectedMins(k);
       monthMap[mk].days++;
     });
@@ -1260,7 +1267,7 @@ function renderHistorico(){
     const fer=isFeriasDay(key);
     if(!rec&&!fer) continue;
     const dow=new Date(y,m,d).getDay();
-    const w=rec?workedMins(rec):0;
+    const w=rec?effectiveWorked(key,rec):0;
     const exp=expectedMins(key);
     const saldo=w-exp;
     const isSun=dow===0;
